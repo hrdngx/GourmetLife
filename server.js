@@ -123,7 +123,10 @@ app.post('/signup', (req, res) => {
   });
 });
 
+
+
 // ユーザーマイページ /home（ログイン必須）
+/*
 app.get('/home', loginCheck, (req, res) => {
   // DBからタイムラインデータなどを取得する場合はここで実装
   const dummyFullcourses = []; // 実際はDBから取得したデータを渡す
@@ -131,7 +134,77 @@ app.get('/home', loginCheck, (req, res) => {
     username: req.session.user.username,
     fullcourses: dummyFullcourses
   });
+});*/
+
+
+/*
+app.get('/home', loginCheck, (req, res) => {
+  // ユーザー情報とコース情報をJOINして、最新のコースを取得
+  const timelineQuery = `
+    SELECT courses.*, users.username, users.profile_image
+    FROM courses
+    JOIN users ON courses.user_id = users.id
+    ORDER BY courses.created_at DESC
+    LIMIT 20
+  `;
+  db.query(timelineQuery, (err, results) => {
+    if (err) {
+      console.error('タイムライン取得エラー:', err);
+      return res.status(500).send('サーバーエラー');
+    }
+    res.render('home', {
+      username: req.session.user.username,
+      fullcourses: results
+    });
+  });
+});*/
+
+
+
+app.get('/home', loginCheck, (req, res) => {
+  // ユーザー情報とコース情報をJOINして、最新のコースを取得
+  const timelineQuery = `
+    SELECT courses.*, users.username, users.profile_image
+    FROM courses
+    JOIN users ON courses.user_id = users.id
+    ORDER BY courses.created_at DESC
+    LIMIT 20
+  `;
+  db.query(timelineQuery, (err, courses) => {
+    if (err) {
+      console.error('タイムライン取得エラー:', err);
+      return res.status(500).send('サーバーエラー');
+    }
+    let count = courses.length;
+    if (count === 0) {
+      return res.render('home', { username: req.session.user.username, fullcourses: [] });
+    }
+    courses.forEach(course => {
+      const selectDishesQuery = 'SELECT * FROM course_dishes WHERE course_id = ?';
+      db.query(selectDishesQuery, [course.id], (err, dishResults) => {
+        if (err) {
+          console.error('料理情報取得エラー:', err);
+          course.dishes = [];
+        } else {
+          course.dishes = dishResults;
+        }
+        count--;
+        if (count === 0) {
+          res.render('home', {
+            username: req.session.user.username,
+            fullcourses: courses
+          });
+        }
+      });
+    });
+  });
 });
+
+
+
+
+
+
 
 
 // 検索画面 GET /search （ログイン必須）
@@ -245,21 +318,6 @@ app.post('/profile/delete-image', loginCheck, (req, res) => {
     res.redirect('/profile');
   });
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // フルコース作成・更新ページ（/course） ※confirm.ejs を利用
 app.get('/course', loginCheck, (req, res) => {

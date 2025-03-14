@@ -1,95 +1,251 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ホーム - Gourmet Life</title>
-    <link rel="stylesheet" href="css/reset.css">
-    <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>マイページ - Gourmet Life</title>
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/index.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    /* CSS Variables と基本設定 */
+    :root {
+      --primary-color: #007bff;
+      --primary-hover: #0056b3;
+      --bg-color: #f5f5f5;
+      --card-bg: #ffffff;
+      --border-color: #e0e0e0;
+      --text-color: #333;
+      --font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-color);
+      margin: 0;
+      padding: 0;
+      color: var(--text-color);
+    }
+    .wrapper {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 20px;
+    }
+    main {
+      background: var(--card-bg);
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    h1.main-title {
+      text-align: center;
+      margin-bottom: 40px;
+      font-size: 2.5rem;
+    }
+    .greeting {
+      text-align: center;
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+    }
+    .timeline {
+      margin-top: 40px;
+    }
+    .timeline h2 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+    .timeline-data {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .fullcourse-item {
+      padding: 20px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background-color: #fafafa;
+    }
+    .fullcourse-item h3 {
+      margin-top: 0;
+      font-size: 1.6rem;
+    }
+    .fullcourse-item p {
+      margin: 8px 0;
+    }
+    .fullcourse-item .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .fullcourse-item .user-info img {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+    }
+    .course-dishes {
+      margin-top: 15px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border-color);
+    }
+    .course-dishes h4 {
+      margin-bottom: 10px;
+    }
+    .dish-item {
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 1px dashed var(--border-color);
+      border-radius: 4px;
+    }
+    .dish-item h5 {
+      margin: 0 0 5px 0;
+      font-size: 1.2rem;
+    }
+    .dish-item img {
+      max-width: 100px;
+      max-height: 100px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      object-fit: cover;
+      margin-top: 5px;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid var(--border-color);
+      margin: 30px 0;
+    }
+    .navigation {
+      margin-top: 40px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .nav-links a {
+      text-decoration: none;
+      font-size: 1rem;
+      color: var(--primary-color);
+      border: 1px solid var(--primary-color);
+      padding: 10px 20px;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+    .nav-links a:hover {
+      background-color: var(--primary-color);
+      color: #fff;
+    }
+    iframe {
+      margin-top: 20px;
+      border: 1px solid var(--border-color);
+    }
+  </style>
 </head>
-
 <body>
-    <div class="wrapper">
-        <%- include('partials/header.ejs', { currentPath: currentPath }) %>
-
-        <main>
-            <h1>マイページ</h1>
-
-            <div>
-                <!-- jwtからusernameを取得 -->
-                <h2>こんにちは、<%= username %>さん</h2>
-            </div>
-
-            <div class="log">
-                <h2>最新のアクティビティ</h2>
-                <div class="log-data">
-                    <ul>
-                        <li>2025/01/01 12:00 フルコース「和食」を投稿しました。</li>
-                        <li>2025/01/01 12:00 フルコース「洋食」を投稿しました。</li>
-                        <li>2025/01/01 12:00 フルコース「中華」を投稿しました。</li>
-                        <li>2025/01/01 12:00 Test</li>
-                    </ul>
+  <div class="wrapper">
+    <%- include('partials/header.ejs', { currentPath: currentPath }) %>
+    <main>
+      <h1 class="main-title">マイページ</h1>
+      
+      <!-- 挨拶 -->
+      <div class="greeting">
+        <h2>こんにちは、<%= username %>さん</h2>
+      </div>
+      
+      <!-- タイムライン -->
+      <div class="timeline">
+        <h2>タイムライン</h2>
+        <div class="timeline-data">
+          <% if (fullcourses && fullcourses.length > 0) { %>
+            <% 
+              // dishCode とラベルの対応
+              const dishLabels = {
+                1: '前菜',
+                2: 'スープ',
+                3: '魚料理',
+                4: '肉料理',
+                5: 'メインディッシュ',
+                6: 'サラダ',
+                7: 'デザート',
+                8: 'ドリンク'
+              };
+            %>
+            <% fullcourses.forEach(function(course) { %>
+              <div class="fullcourse-item">
+                <!-- コース基本情報 -->
+                <% if (course.course_name) { %>
+                  <h3><%= course.course_name %></h3>
+                <% } %>
+                <% if (course.explanation) { %>
+                  <p><strong>説明:</strong> <%= course.explanation %></p>
+                <% } %>
+                <p><strong>投稿日:</strong> <%= new Date(course.created_at).toLocaleString('ja-JP') %></p>
+                <div class="user-info">
+                  <% if (course.profile_image) { %>
+                    <img src="data:image/jpeg;base64,<%= Buffer.from(course.profile_image).toString('base64') %>" alt="投稿者画像">
+                  <% } else { %>
+                    <img src="/images/default-profile.png" alt="デフォルト画像">
+                  <% } %>
+                  <p><strong>投稿者:</strong> <%= course.username %></p>
                 </div>
-            </div>
-
-            <div class="timeline">
-                <h2>タイムライン</h2>
-                <div class="timeline-data">
-                    <ul>
-                        <% if (typeof fullcourses !== 'undefined' && fullcourses.length > 0) { %>
-                            <% fullcourses.forEach(function(course) { %>
-                                <li>
-                                    <div class="fullcourse-item">
-                                        <h3><%= course.title %> : <%= course.username %></h3>
-                                        <p>いいね数: <%= course.likes %> / コメント数: <%= course.comments %></p>
-                                        <p>投稿日: <%= course.date %></p>
-                                        <div class="course-images">
-                                            <img src="<%= course.appetizerImage %>" alt="前菜">
-                                            <img src="<%= course.soupImage %>" alt="スープ">
-                                            <img src="<%= course.fishImage %>" alt="魚料理">
-                                            <img src="<%= course.meatImage %>" alt="肉料理">
-                                        </div>
-                                    </div>
-                                </li>
-                            <% }); %>
-                        <% } else { %>
-                            <p>フルコースのデータがありません。</p>
-                        <% } %>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="navigation">
-                <h2>Navigation</h2>
-                <div class="nav-links">
-                    <div>
-                        <a href="/search" target="nav-preview">Search</a>
-                    </div>
-                    <div>
-                        <a href="/fullcourse" target="nav-preview">Full Course</a>
-                    </div>
-                    <div>
-                        <a href="/profile" target="nav-preview">Profile</a>
-                    </div>
-                    <div>
-                        <a href="/follow" target="nav-preview">Follow</a>
-                    </div>
-                    <div>
-                        <a href="/timeline" target="nav-preview">Timeline</a>
-                    </div>
-                    <div>
-                        <a href="/qa" target="nav-preview">Q&A</a>
-                    </div>
-                </div>
-                <iframe name="nav-preview" width="100%" height="300"></iframe>
-            </div>
-
-        </main>
-
-        <%- include('../views/partials/footer.ejs') %>
-    </div>
+                
+                <!-- 料理情報（存在するフィールドのみ出力） -->
+                <% if (course.dishes && course.dishes.length > 0) { %>
+                  <div class="course-dishes">
+                    <h4>料理詳細</h4>
+                    <% course.dishes.forEach(function(dish) { %>
+                      <% if (dish.title || dish.link || dish.description || dish.image) { %>
+                        <div class="dish-item">
+                          <% if (dish.dish_code && dishLabels[dish.dish_code]) { %>
+                            <h5><%= dishLabels[dish.dish_code] %></h5>
+                          <% } %>
+                          <% if (dish.title) { %>
+                            <p><strong>料理名:</strong> <%= dish.title %></p>
+                          <% } %>
+                          <% if (dish.link) { %>
+                            <p><strong>リンク:</strong> <a href="<%= dish.link %>" target="_blank"><%= dish.link %></a></p>
+                          <% } %>
+                          <% if (dish.description) { %>
+                            <p><strong>説明:</strong> <%= dish.description %></p>
+                          <% } %>
+                          <% if (dish.image) { %>
+                            <div class="dish-image">
+                              <img src="data:image/jpeg;base64,<%= Buffer.from(dish.image).toString('base64') %>" alt="<%= dish.title %>">
+                            </div>
+                          <% } %>
+                        </div>
+                      <% } %>
+                    <% }); %>
+                  </div>
+                <% } %>
+              </div>
+              <hr>
+            <% }); %>
+          <% } else { %>
+            <p>フルコースのデータがありません。</p>
+          <% } %>
+        </div>
+      </div>
+      
+      <!-- Navigation セクション -->
+      <div class="navigation">
+        <h2>Navigation</h2>
+        <div class="nav-links">
+          <a href="/search" target="nav-preview">Search</a>
+          <a href="/fullcourse" target="nav-preview">Full Course</a>
+          <a href="/profile" target="nav-preview">Profile</a>
+          <a href="/follow" target="nav-preview">Follow</a>
+          <a href="/timeline" target="nav-preview">Timeline</a>
+          <a href="/qa" target="nav-preview">Q&A</a>
+        </div>
+        <iframe name="nav-preview" width="100%" height="300"></iframe>
+      </div>
+    </main>
+    <%- include('partials/footer.ejs') %>
+  </div>
 </body>
-
 </html>
