@@ -133,74 +133,6 @@ app.get('/home', loginCheck, (req, res) => {
   });
 });
 
-// ログイン必須の検索画面
-/*
-app.get('/search', loginCheck, (req, res) => {
-  const q = req.query.q;
-  if (!q) {
-    return res.render('search', { courses: [], q: '' });
-  }
-  const searchQuery = `
-    SELECT * FROM courses
-    WHERE course_name LIKE ? OR explanation LIKE ?
-    ORDER BY updated_at DESC
-  `;
-  const searchTerm = '%' + q + '%';
-  db.query(searchQuery, [searchTerm, searchTerm], (err, results) => {
-    if (err) {
-      console.error('検索エラー:', err);
-      return res.status(500).send('サーバーエラー');
-    }
-    res.render('search', { courses: results, q });
-  });
-});*/
-
-
-// 検索画面 GET /search （ログイン必須）
-/*
-app.get('/search', loginCheck, (req, res) => {
-  const q = req.query.q;
-  if (!q) {
-    return res.render('search', { courses: [], q: '' });
-  }
-  const searchTerm = '%' + q + '%';
-  // courses と users を JOIN して、投稿者情報を取得
-  const searchQuery = `
-    SELECT courses.*, users.username, users.profile_image
-    FROM courses
-    JOIN users ON courses.user_id = users.id
-    WHERE courses.course_name LIKE ? OR courses.explanation LIKE ?
-    ORDER BY courses.updated_at DESC
-  `;
-  db.query(searchQuery, [searchTerm, searchTerm], (err, courseResults) => {
-    if (err) {
-      console.error('検索エラー:', err);
-      return res.status(500).send('サーバーエラー');
-    }
-    if (courseResults.length === 0) {
-      return res.render('search', { courses: [], q });
-    }
-    // 各コースについて、関連する料理情報を取得
-    let courses = courseResults;
-    let count = courses.length;
-    courses.forEach(course => {
-      const selectDishesQuery = 'SELECT * FROM course_dishes WHERE course_id = ?';
-      db.query(selectDishesQuery, [course.id], (err, dishResults) => {
-        if (err) {
-          console.error('料理情報取得エラー:', err);
-          course.dishes = [];
-        } else {
-          course.dishes = dishResults;
-        }
-        count--;
-        if (count === 0) {
-          res.render('search', { courses, q });
-        }
-      });
-    });
-  });
-});*/
-
 
 // 検索画面 GET /search （ログイン必須）
 app.get('/search', loginCheck, (req, res) => {
@@ -246,18 +178,88 @@ app.get('/search', loginCheck, (req, res) => {
 });
 
 
-
-
-
-
-// プロフィール画面（ログイン必須）
 app.get('/profile', loginCheck, (req, res) => {
+  let profileImage = req.session.user.profile_image;
+  if (profileImage) {
+    // Buffer を Base64 文字列に変換し、データURL形式にする
+    profileImage = `data:image/jpeg;base64,${Buffer.from(profileImage).toString('base64')}`;
+  } else {
+    profileImage = '/images/default-profile.png';
+  }
   res.render('profile', {
     username: req.session.user.username,
-    profileImage: req.session.user.profile_image || '/images/default-profile.png',
+    profileImage: profileImage,
     bio: req.session.user.bio || 'ここに自己紹介が表示されます'
   });
 });
+
+
+
+const profileUpload = multer({ storage: multer.memoryStorage() });
+
+
+app.post('/profile/edit', loginCheck, profileUpload.single('profile_image'), (req, res) => {
+  const userId = req.session.user.id;
+  const bio = req.body.bio || '';
+  let profileImage = null;
+
+  // 画像がアップロードされていれば、バッファを取得
+  if (req.file) {
+    profileImage = req.file.buffer;
+  }
+
+  let query, params;
+  if (profileImage) {
+    query = 'UPDATE users SET profile_image = ?, bio = ? WHERE id = ?';
+    params = [profileImage, bio, userId];
+  } else {
+    query = 'UPDATE users SET bio = ? WHERE id = ?';
+    params = [bio, userId];
+  }
+
+  db.query(query, params, (err, result) => {
+    if (err) {
+      console.error('プロフィール更新エラー:', err);
+      return res.status(500).send('サーバーエラー');
+    }
+    // セッション内のユーザー情報も更新
+    req.session.user.bio = bio;
+    if (profileImage) {
+      req.session.user.profile_image = profileImage;
+    }
+    res.redirect('/profile');
+  });
+});
+
+
+app.post('/profile/delete-image', loginCheck, (req, res) => {
+  const userId = req.session.user.id;
+  const query = 'UPDATE users SET profile_image = NULL WHERE id = ?';
+  db.query(query, [userId], (err, result) => {
+    if (err) {
+      console.error('プロフィール画像削除エラー:', err);
+      return res.status(500).send('サーバーエラー');
+    }
+    // セッション内のプロフィール画像も削除
+    req.session.user.profile_image = null;
+    res.redirect('/profile');
+  });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // フルコース作成・更新ページ（/course） ※confirm.ejs を利用
 app.get('/course', loginCheck, (req, res) => {
