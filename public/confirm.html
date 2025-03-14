@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+     <!--　このページをモバイル端末でも適切に表示できるようにするコード　-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>入力確認 - Gourmet Life</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/account.css">
+    <link rel="stylesheet" href="css/confirm.css">
+</head>
+
+<body>
+    <header class="header">
+        <div class="title-bar">
+            <div class="logo">
+                <a href="/">
+                    <img src="images/logo.png" style="object-fit: cover; width: 300px; height: 50px;" alt="Gourmet Life">
+                </a>
+            </div>
+            <div class="account">
+                <a href="signup.html">会員登録</a>
+                <a href="login.html">ログイン</a>
+            </div>
+        </div>
+
+        <!--ナビゲーションバー　会員登録には必要ないかもしれない-->
+        <!--なぜなら、途中で登録中に全く違う画面に遷移する可能性は入らない-->
+        <!--飾りだけで、遷移不可能にしてもよい-->
+        <div class="navigation-bar">
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="search.html">Search</a></li>
+                    <li><a href="fullcourse.html">Full Course</a></li>
+                    <li><a href="profile.html">Profile</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="confirmation-container">
+            <h1 class="main-title">入力確認</h1>
+
+            <div class="confirmation-group">
+                <label>ユーザ名:</label>
+                <span id="confirm-username"></span>
+            </div>
+
+            <div class="confirmation-group">
+                <label>メールアドレス:</label>
+                <span id="confirm-email"></span>
+            </div>
+
+            <div class="confirmation-group">
+                <label>パスワード:</label>
+                <span id="confirm-password"></span>
+            </div>
+
+            <div class="confirmation-group">
+                <label>利用規約への同意:</label>
+                <span id="confirm-agree"></span>
+            </div>
+
+            <div class="button-group">
+                <button id="back-button">戻る</button>
+                <button id="submit-button">登録する</button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2024 Gourmet Life</p>
+        </div>
+    </footer>
+
+</body>
+</html>

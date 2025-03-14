@@ -1,0 +1,13 @@
+・<footer> タグ
+　Webページのフッター（ページの最下部）を示すためのHTMLのセマンティック要素。
+　　class="footer" というクラスが付いているので、CSSでデザインを指定可能。
+　　<div class="footer-content">
+
+・<small> タグ
+　footer 内でさらにレイアウトを整理するための div 要素。
+　class="footer-content" というクラスが付いているので、スタイルを適用可能。
+　　
+
+・文字を小さく表示するためのHTML要素。
+　　&copy; 2024 Gourmet Life は 「© 2024 Gourmet Life」 という表記を表示する。
+　　&copy; は HTML の特殊文字（エンティティ）で、コピーライト記号（©）を表す。

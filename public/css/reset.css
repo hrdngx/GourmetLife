@@ -1,0 +1,58 @@
+html {
+    overflow-y: scroll;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+a {
+    text-decoration: none;
+}
+
+ul,
+li {
+    list-style: none;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+body {
+    background-color: #f8f7f4;
+}
+
+h1, h2, h3, h4, h5 {
+    text-align: center;
+}
+
+/* ヘッダー */
+header {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #f8f7f4;
+}
+
+main {
+    background-color: #f8f7f4;
+    height: 800px;
+    flex: 1;
+}
+
+/* フッター */
+footer {
+    width: 100%;
+    line-height: 50px;
+    background-color: #f8f7f4;
+    text-align: center;
+}

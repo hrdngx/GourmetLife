@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>検索画面 - Gourmet Life</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="wrapper">
+        <%- include('partials/header.ejs', { currentPath: currentPath }) %>
+
+        <main>
+            <h1 class="main-title">検索画面</h1>
+
+            <div class="search-form">
+                <form action="/search" method="get">
+                    <input type="text" name="q" class="search-input" placeholder="検索">
+                    <button type="submit" class="search-btn" value="">検索</button>
+                </form>
+            </div>
+
+            <div class="search-result">
+                <h1 class="">検索結果</h1>
+                <div class="table_wrap">
+                    <table class="" border="1">
+                        <thead>
+                            <tr>
+                                <th>名称</th>
+                                <th>いいね数</th>
+                                <th>最終更新日</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><a href="#">大学生Aさんのフルコース</a></td>
+                                <td><a href="#">99999いいね</a></td>
+                                <td>2024/01/01</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <%- include('../views/partials/footer.ejs') %>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,40 @@
+<head>
+    <link rel="stylesheet" href="css/header.css">
+</head>
+
+<header class="header">
+    <div class="title-bar">
+        <div class="logo">
+            <a href="/">
+                <img src="images/logo.png" alt="Gourmet Life">
+            </a>
+        </div>
+        <div class="account">
+            <% if (session.user) { %>
+                <a href="/logout" class="logout">ログアウト</a>
+            <% } else { %>
+                <a href="/login" class="login">ログイン</a>
+                <a href="/signup" class="signup">会員登録</a>
+            <% } %>
+        </div>
+    </div>
+
+    <div class="navigation-bar">
+        <nav>
+            <ul>
+                <li class="<%= currentPath.startsWith('/home') ? 'current' : '' %>">
+                    <a href="/home">Home</a>
+                </li>
+                <li class="<%= currentPath.startsWith('/search') ? 'current' : '' %>">
+                    <a href="/search">Search</a>
+                </li>
+                <li class="<%= currentPath.startsWith('/fullcourse') ? 'current' : '' %>">
+                    <a href="/fullcourse">Full Course</a>
+                </li>
+                <li class="<%= currentPath.startsWith('/profile') ? 'current' : '' %>">
+                    <a href="/profile">Profile</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</header>

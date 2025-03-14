@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プロフィール - Gourmet Life</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="wrapper">
+        <%- include('partials/header.ejs', { currentPath: currentPath }) %>
+
+            <main>
+                <h1 class="main-title">プロフィール</h1>
+                <div class="profile-card">
+                    <div class="profile-image-wrapper">
+                        <img src="<%= profileImage %>" alt="プロフィール画像" class="profile-image">
+                    </div>
+                    <div class="profile-details">
+                        <p class="profile-label">ユーザー名</p>
+                        <h1 class="profile-username">
+                            <%= username %>
+                        </h1>
+
+                        <p class="profile-label">自己紹介</p>
+                        <p class="profile-bio">
+                            <%= bio %>
+                        </p>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="profile-settings">
+                    <h2 class="settings-title">プロフィール設定</h2>
+                    <form action="/profile/edit" method="POST" enctype="multipart/form-data">
+                        <label>プロフィール画像を変更 (最大 5MB):</label>
+                        <input type="file" name="profile_image" accept="image/*">
+
+                        <label>自己紹介 (最大 200 文字):</label>
+                        <textarea name="bio" maxlength="200"><%= bio %></textarea>
+
+                        <div class="button-group">
+                            <button type="submit" class="button button-save">保存</button>
+                            <% if (profileImage !== "/images/default-profile.png") { %>
+                                <button type="submit" formaction="/profile/delete-image" class="button button-delete">画像を削除</button>
+                            <% } %>
+                        </div>
+                    </form>
+                </div>
+            </main>
+
+            <%- include('partials/footer.ejs') %>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const notificationsButton = document.querySelector('.notifications-button');
+            const notificationsDropdown = document.querySelector('.notifications-dropdown');
+
+            if (notificationsButton) {
+                notificationsButton.addEventListener('click', function (event) {
+                    event.stopPropagation();
+                    notificationsDropdown.classList.toggle('show');
+                });
+
+                document.addEventListener('click', function (event) {
+                    if (!notificationsButton.contains(event.target) && !notificationsDropdown.contains(event.target)) {
+                        notificationsDropdown.classList.remove('show');
+                    }
+                });
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const bioInput = document.getElementById("bio-input");
+            const charCount = document.getElementById("char-count");
+
+            if (bioInput) {
+                // 初期文字数を表示
+                charCount.textContent = bioInput.value.length;
+
+                // 入力時に文字数を更新
+                bioInput.addEventListener("input", function () {
+                    const maxLength = 200;
+                    if (bioInput.value.length > maxLength) {
+                        bioInput.value = bioInput.value.substring(0, maxLength);
+                    }
+                    charCount.textContent = bioInput.value.length;
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

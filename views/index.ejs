@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gourmet Life</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div class="wrapper">
+        <%- include('partials/header.ejs', { currentPath: currentPath }) %>
+
+        <main>
+            <div class="top-image">
+                <img src="images/steak.jpg" width="100%" alt="steak">
+                <div class="welcome-message">
+                    <h1>Gourmet Life</h1>
+                    <div class="account">
+                        <% if (session.user) { %>
+                            <a href="/logout" class="logout">ログアウト</a>
+                        <% } else { %>
+                            <a href="/login" class="login">ログイン</a>
+                            <a href="/signup" class="signup">会員登録</a>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="about">
+                <h2>About</h2>
+                <p>
+                    当サイトでは、自分だけの人生の「フルコース」を作成し、シェアすることが可能です。<br><br>
+                    「魚料理」「肉料理」「前菜」など、様々なカテゴリーから好みの料理を選び、組み合わせることで、自分だけの「フルコース」を創り上げることができます。<br><br>
+                    「フルコース」を他のユーザーとシェアすることで、新たな料理の発見や交流が生まれます。<br><br>
+                    あなただけの「フルコース」で、料理の世界をゆったりと楽しんでみませんか。<br><br>
+                </p>
+            </div>
+        </main>
+
+        <%- include('../views/partials/footer.ejs') %>
+    </div>
+</body>
+
+</html>

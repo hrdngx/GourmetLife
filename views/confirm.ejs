@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>確認画面 - Gourmet Life</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/account.css">
+</head>
+
+<body>
+    <div class="wrapper">
+        <%- include('partials/header.ejs', { currentPath: currentPath }) %>
+
+        <main>
+            <h1 class="main-title">確認画面</h1>
+
+            <div class="confirmation">
+                <p><strong>ユーザ名:</strong>
+                    <%= username %>
+                </p>
+                <p><strong>メールアドレス:</strong>
+                    <%= email %>
+                </p>
+                <!-- パスワードはセキュリティのため表示しません　表示してもいい？-->
+            </div>
+
+            <form action="/register" method="POST">
+                <!-- 隠しフィールドとしてデータを送信 -->
+                <input type="hidden" name="username" value="<%= username %>">
+                <input type="hidden" name="email" value="<%= email %>">
+                <input type="hidden" name="password" value="<%= password %>">
+
+                <button type="submit">登録する</button>
+                <a href="/signup">戻る</a>
+            </form>
+        </main>
+
+        <%- include('../views/partials/footer.ejs') %>
+    </div>
+</body>
+
+</html>

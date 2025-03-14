@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>フルコース - Gourmet Life</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="wrapper">
+        <%- include('partials/header.ejs', { currentPath: currentPath }) %>
+
+        <main>
+            <h1 class="main-title">フルコース</h1>
+
+            <div class="fullcourse-form">
+                <!-- POST /fullcourse に送信 -->
+                <form action="/fullcourse" method="POST" enctype="multipart/form-data">
+                    <section class="form-group">
+                        <label for="course-name">タイトル</label>
+                        <!-- 既に作成済みデータがあれば表示 -->
+                        <input
+                            type="text"
+                            id="course-name"
+                            name="course-name"
+                            required
+                            value="<%= course ? course.course_name : '' %>"
+                        >
+                    </section>
+
+                    <section class="explanation">
+                        <label for="explanation">フルコースの説明</label>
+                        <textarea id="explanation" name="explanation"><%= course ? course.explanation : '' %></textarea>
+                    </section>
+
+                    <hr>
+
+                    <!-- 前菜 -->
+                    <details class="appetizer" open>
+                        <summary>前菜</summary>
+
+                        <label for="appetizer-title">料理名</label>
+                        <input
+                            type="text"
+                            id="appetizer-title"
+                            name="appetizer-title"
+                            value="<%= course ? course.appetizer_title : '' %>"
+                        >
+
+                        <label for="appetizer-link">リンク</label>
+                        <input
+                            type="text"
+                            id="appetizer-link"
+                            name="appetizer-link"
+                            value="<%= course ? course.appetizer_link : '' %>"
+                        >
+
+                        <label for="appetizer-image">画像</label>
+                        <input type="file" id="appetizer-image" name="appetizer-image" accept="image/*">
+                        <!-- 既存画像がある場合は表示 -->
+                        <% if (course && course.appetizer_image) { %>
+                            <div>
+                                <p>登録済み画像:</p>
+                                <img
+                                    src="data:image/png;base64,<%= course.appetizer_image.toString('base64') %>"
+                                    alt="Appetizer"
+                                    style="max-width:200px;"
+                                >
+                            </div>
+                        <% } %>
+
+                        <label for="appetizer-description">説明</label>
+                        <textarea
+                            id="appetizer-description"
+                            name="appetizer-description"><%= course ? course.appetizer_description : '' %></textarea>
+                    </details>
+
+                    <!-- スープ -->
+                    <details class="soup">
+                        <summary>スープ</summary>
+
+                        <label for="soup-title">料理名</label>
+                        <input
+                            type="text"
+                            id="soup-title"
+                            name="soup-title"
+                            value="<%= course ? course.soup_title : '' %>"
+                        >
+
+                        <label for="soup-link">リンク</label>
+                        <input
+                            type="text"
+                            id="soup-link"
+                            name="soup-link"
+                            value="<%= course ? course.soup_link : '' %>"
+                        >
+
+                        <label for="soup-image">画像</label>
+                        <input type="file" id="soup-image" name="soup-image" accept="image/*">
+                        <% if (course && course.soup_image) { %>
+                            <div>
+                                <p>登録済み画像:</p>
+                                <img
+                                    src="data:image/png;base64,<%= course.soup_image.toString('base64') %>"
+                                    alt="Soup"
+                                    style="max-width:200px;"
+                                >
+                            </div>
+                        <% } %>
+
+                        <label for="soup-description">説明</label>
+                        <textarea
+                            id="soup-description"
+                            name="soup-description"><%= course ? course.soup_description : '' %></textarea>
+                    </details>
+
+                    <!-- 魚料理 -->
+                    <details class="fish">
+                        <summary>魚料理</summary>
+
+                        <label for="fish-title">料理名</label>
+                        <input
+                            type="text"
+                            id="fish-title"
+                            name="fish-title"
+                            value="<%= course ? course.fish_title : '' %>"
+                        >
+
+                        <label for="fish-link">リンク</label>
+                        <input
+                            type="text"
+                            id="fish-link"
+                            name="fish-link"
+                            value="<%= course ? course.fish_link : '' %>"
+                        >
+
+                        <label for="fish-image">画像</label>
+                        <input type="file" id="fish-image" name="fish-image" accept="image/*">
+                        <% if (course && course.fish_image) { %>
+                            <div>
+                                <p>登録済み画像:</p>
+                                <img
+                                    src="data:image/png;base64,<%= course.fish_image.toString('base64') %>"
+                                    alt="Fish"
+                                    style="max-width:200px;"
+                                >
+                            </div>
+                        <% } %>
+
+                        <label for="fish-description">説明</label>
+                        <textarea
+                            id="fish-description"
+                            name="fish-description"><%= course ? course.fish_description : '' %></textarea>
+                    </details>
+
+                    <!-- 肉料理 -->
+                    <details class="meat">
+                        <summary>肉料理</summary>
+
+                        <label for="meat-title">料理名</label>
+                        <input
+                            type="text"
+                            id="meat-title"
+                            name="meat-title"
+                            value="<%= course ? course.meat_title : '' %>"
+                        >
+
+                        <label for="meat-link">リンク</label>
+                        <input
+                            type="text"
+                            id="meat-link"
+                            name="meat-link"
+                            value="<%= course ? course.meat_link : '' %>"
+                        >
+
+                        <label for="meat-image">画像</label>
+                        <input type="file" id="meat-image" name="meat-image" accept="image/*">
+                        <% if (course && course.meat_image) { %>
+                            <div>
+                                <p>登録済み画像:</p>
+                                <img
+                                    src="data:image/png;base64,<%= course.meat_image.toString('base64') %>"
+                                    alt="Meat"
+                                    style="max-width:200px;"
+                                >
+                            </div>
+                        <% } %>
+
+                        <label for="meat-description">説明</label>
+                        <textarea
+                            id="meat-description"
+                            name="meat-description"><%= course ? course.meat_description : '' %></textarea>
+                    </details>
+
+                    <!-- メインディッシュ -->
+                    <details class="maindish">
+                        <summary>メインディッシュ</summary>
+
+                        <label for="maindish-title">料理名</label>
+                        <input
+                            type="text"
+                            id="maindish-title"
+                            name="maindish-title"
+                            value="<%= course ? course.maindish_title : '' %>"
+                        >
+
+                        <label for="maindish-link">リンク</label>
+                        <input
+                            type="text"
+                            id="maindish-link"
+                            name="maindish-link"
+                            value="<%= course ? course.maindish_link : '' %>"
+                        >
+
+                        <label for="maindish-image">画像</label>
+                        <input type="file" id="maindish-image" name="maindish-image" accept="image/*">
+                        <% if (course && course.maindish_image) { %>
+                            <div>
+                                <p>登録済み画像:</p>
+                                <img
+                                    src="data:image/png;base64,<%= course.maindish_image.toString('base64') %>"
+                                    alt="Maindish"
+                                    style="max-width:200px;"
+                                >
+                            </div>
+                        <% } %>
+
+                        <label for="maindish-description">説明</label>
+                        <textarea
+                            id="maindish-description"
+                            name="maindish-description"><%= course ? course.maindish_description : '' %></textarea>
+                    </details>
+
+                    <!-- サラダ -->
+                    <details class="salad">
+                        <summary>サラダ</summary>
+
+                        <label for="salad-title">料理名</label>
+                        <input
+                            type="text"
+                            id="salad-title"
+                            name="salad-title"
+                            value="<%= course ? course.salad_title : '' %>"
+                        >
+
+                        <label for="salad-link">リンク</label>
+                        <input
+                            type="text"
+                            id="salad-link"
+                            name="salad-link"
+                            value="<%= course ? course.salad_link : '' %>"
+                        >
+
+                        <label for="salad-image">画像</label>
+                        <input type="file" id="salad-image" name="salad-image" accept="image/*">
+                        <% if (course && course.salad_image) { %>
+                            <div>
+                                <p>登録済み画像:</p>
+                                <img
+                                    src="data:image/png;base64,<%= course.salad_image.toString('base64') %>"
+                                    alt="Salad"
+                                    style="max-width:200px;"
+                                >
+                            </div>
+                        <% } %>
+
+                        <label for="salad-description">説明</label>
+                        <textarea
+                            id="salad-description"
+                            name="salad-description"><%= course ? course.salad_description : '' %></textarea>
+                    </details>
+
+                    <!-- デザート -->
+                    <details class="dessert">
+                        <summary>デザート</summary>
+
+                        <label for="dessert-title">料理名</label>
+                        <input
+                            type="text"
+                            id="dessert-title"
+                            name="dessert-title"
+                            value="<%= course ? course.dessert_title : '' %>"
+                        >
+
+                        <label for="dessert-link">リンク</label>
+                        <input
+                            type="text"
+                            id="dessert-link"
+                            name="dessert-link"
+                            value="<%= course ? course.dessert_link : '' %>"
+                        >
+
+                        <label for="dessert-image">画像</label>
+                        <input type="file" id="dessert-image" name="dessert-image" accept="image/*">
+                        <% if (course && course.dessert_image) { %>
+                            <div>
+                                <p>登録済み画像:</p>
+                                <img
+                                    src="data:image/png;base64,<%= course.dessert_image.toString('base64') %>"
+                                    alt="Dessert"
+                                    style="max-width:200px;"
+                                >
+                            </div>
+                        <% } %>
+
+                        <label for="dessert-description">説明</label>
+                        <textarea
+                            id="dessert-description"
+                            name="dessert-description"><%= course ? course.dessert_description : '' %></textarea>
+                    </details>
+
+                    <!-- ドリンク -->
+                    <details class="drink">
+                        <summary>ドリンク</summary>
+
+                        <label for="drink-title">料理名</label>
+                        <input
+                            type="text"
+                            id="drink-title"
+                            name="drink-title"
+                            value="<%= course ? course.drink_title : '' %>"
+                        >
+
+                        <label for="drink-link">リンク</label>
+                        <input
+                            type="text"
+                            id="drink-link"
+                            name="drink-link"
+                            value="<%= course ? course.drink_link : '' %>"
+                        >
+
+                        <label for="drink-image">画像</label>
+                        <input type="file" id="drink-image" name="drink-image" accept="image/*">
+                        <% if (course && course.drink_image) { %>
+                            <div>
+                                <p>登録済み画像:</p>
+                                <img
+                                    src="data:image/png;base64,<%= course.drink_image.toString('base64') %>"
+                                    alt="Drink"
+                                    style="max-width:200px;"
+                                >
+                            </div>
+                        <% } %>
+
+                        <label for="drink-description">説明</label>
+                        <textarea
+                            id="drink-description"
+                            name="drink-description"><%= course ? course.drink_description : '' %></textarea>
+                    </details>
+
+                    <div class="form-group login">
+                        <button type="submit" class="fullcourse-btn">フルコースを作成 / 更新</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+        <%- include('../views/partials/footer.ejs') %>
+    </div>
+</body>
+</html>

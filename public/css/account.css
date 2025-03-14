@@ -1,0 +1,70 @@
+body {
+    background-color: #f8f7f4;
+}
+
+main {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    justify-content: center;
+}
+
+h1,
+h2 {
+    text-align: center;
+}
+
+.form-group {
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+hr {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.account-form label {
+    display: inline-block;
+    width: 160px;
+    text-align: left;
+}
+
+.account-form input {
+    width: 250px;
+    height: 40px;
+    border-radius: 5px;
+}
+
+.terms-content {
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    height: 200px;
+    overflow-y: scroll;
+}
+
+.terms-content p {
+    margin: 0;
+}
+
+#agree-checkbox {
+    margin-top: 16px;
+    margin-bottom: 0px;
+}
+
+.agree {
+    text-align: center;
+}
+
+.account-btn {
+    background-color: #333;
+    color: #fff;
+    font-size: large;
+
+    margin: 1rem;
+    padding: 10px 30%;
+    border-radius: 10px;
+
+    cursor: pointer;
+}

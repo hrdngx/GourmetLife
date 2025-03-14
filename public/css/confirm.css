@@ -1,0 +1,25 @@
+.confirmation-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.confirmation-group {
+    margin-bottom: 15px;
+}
+
+.confirmation-group label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+}
+
+.button-group button {
+    padding: 10px 20px;
+    font-size: 16px;
+}
