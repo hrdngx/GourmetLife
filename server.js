@@ -157,6 +157,7 @@ app.get('/search', loginCheck, (req, res) => {
 
 
 // 検索画面 GET /search （ログイン必須）
+/*
 app.get('/search', loginCheck, (req, res) => {
   const q = req.query.q;
   if (!q) {
@@ -198,7 +199,52 @@ app.get('/search', loginCheck, (req, res) => {
       });
     });
   });
+});*/
+
+
+// 検索画面 GET /search （ログイン必須）
+app.get('/search', loginCheck, (req, res) => {
+  const q = req.query.q;
+  if (!q) {
+    return res.render('search', { courses: [], q: '' });
+  }
+  const searchTerm = '%' + q + '%';
+  // courses と users を JOIN して、投稿者情報を取得し、ユーザー名も検索対象に追加
+  const searchQuery = `
+    SELECT courses.*, users.username, users.profile_image
+    FROM courses
+    JOIN users ON courses.user_id = users.id
+    WHERE courses.course_name LIKE ? OR courses.explanation LIKE ? OR users.username LIKE ?
+    ORDER BY courses.updated_at DESC
+  `;
+  db.query(searchQuery, [searchTerm, searchTerm, searchTerm], (err, courseResults) => {
+    if (err) {
+      console.error('検索エラー:', err);
+      return res.status(500).send('サーバーエラー');
+    }
+    if (courseResults.length === 0) {
+      return res.render('search', { courses: [], q });
+    }
+    let courses = courseResults;
+    let count = courses.length;
+    courses.forEach(course => {
+      const selectDishesQuery = 'SELECT * FROM course_dishes WHERE course_id = ?';
+      db.query(selectDishesQuery, [course.id], (err, dishResults) => {
+        if (err) {
+          console.error('料理情報取得エラー:', err);
+          course.dishes = [];
+        } else {
+          course.dishes = dishResults;
+        }
+        count--;
+        if (count === 0) {
+          res.render('search', { courses, q });
+        }
+      });
+    });
+  });
 });
+
 
 
 

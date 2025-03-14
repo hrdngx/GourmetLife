@@ -7,66 +7,147 @@
   <link rel="stylesheet" href="css/reset.css">
   <link rel="stylesheet" href="css/style.css">
   <style>
-    /* 検索結果のリスト表示用スタイル */
+    :root {
+      --primary-color: #2d89ef;
+      --primary-hover: #1b5fa7;
+      --bg-color: #f0f2f5;
+      --card-bg: #ffffff;
+      --text-color: #333333;
+      --border-color: #e0e0e0;
+      --font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      --shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    body {
+      font-family: var(--font-family);
+      background: var(--bg-color);
+      margin: 0;
+      padding: 20px;
+      color: var(--text-color);
+    }
+    .wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    main {
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      margin-top: 20px;
+    }
+    h1.main-title {
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    /* 検索フォーム */
+    .search-form {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .search-form input[type="text"] {
+      flex: 1;
+      max-width: 500px;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    .search-form button {
+      padding: 10px 20px;
+      background: var(--primary-color);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .search-form button:hover {
+      background: var(--primary-hover);
+    }
+    /* コースリスト */
     .course-list {
       list-style: none;
       padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
     }
     .course-item {
-      border: 1px solid #ccc;
-      padding: 20px;
-      margin-bottom: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
       border-radius: 8px;
-      background-color: #fff;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
     .course-header {
       display: flex;
       align-items: center;
-      margin-bottom: 15px;
+      gap: 15px;
     }
     .profile-image {
-      width: 50px;
-      height: 50px;
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
-      margin-right: 15px;
       object-fit: cover;
+      flex-shrink: 0;
+      border: 2px solid var(--primary-color);
+    }
+    .course-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .course-info p, .course-info h2 {
+      margin: 0;
+      font-size: 1rem;
+    }
+    .course-title {
+      font-size: 1.2rem;
+      margin-top: 5px;
+    }
+    .course-explanation {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      color: #555;
+    }
+    /* 料理リスト */
+    .dish-list {
+      list-style: none;
+      padding: 0;
+      margin: 10px 0 0;
+      border-top: 1px dashed var(--border-color);
+    }
+    .dish-item {
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border-color);
+    }
+    .dish-item:last-child {
+      border-bottom: none;
     }
     .label {
       font-weight: bold;
       margin-right: 5px;
     }
-    .course-title {
-      font-size: 1.8rem;
-      margin: 0;
-    }
-    .course-explanation {
-      margin-top: 10px;
-      font-size: 1.1rem;
-    }
-    .dish-list {
-      margin-top: 15px;
-      list-style: none;
-      padding-left: 0;
-    }
-    .dish-item {
-      border-top: 1px solid #ddd;
-      padding: 10px 0;
-    }
-    .dish-item:first-child {
-      border-top: none;
-    }
-    .dish-title {
-      font-weight: bold;
-    }
     .dish-link a {
       color: var(--primary-color);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .dish-link a:hover {
+      text-decoration: underline;
     }
     .dish-image {
-      max-width: 200px;
+      max-width: 100%;
+      max-height: 200px;
       margin-top: 5px;
-    }
-    .dish-description {
-      margin-top: 5px;
+      border-radius: 4px;
+      object-fit: contain;
     }
   </style>
 </head>
@@ -75,68 +156,80 @@
     <%- include('partials/header.ejs', { currentPath: currentPath }) %>
     <main>
       <h1 class="main-title">検索結果</h1>
-      <!-- 検索フォーム -->
-      <form action="/search" method="get">
-        <input type="text" name="q" value="<%= q %>" placeholder="検索">
+      <form class="search-form" action="/search" method="get">
+        <input type="text" name="q" value="<%= q %>" placeholder="キーワードを入力">
         <button type="submit">検索</button>
       </form>
       <% if (courses.length === 0) { %>
-         <p>検索結果はありません。</p>
+        <p style="text-align: center;">検索結果はありません。</p>
       <% } else { %>
-         <ul class="course-list">
-         <% courses.forEach(course => { %>
-           <li class="course-item">
-             <!-- ユーザー情報 -->
-             <div class="course-header">
-               <% if (course.profile_image) { %>
-                 <img src="data:image/png;base64,<%= course.profile_image.toString('base64') %>" alt="<%= course.username %>" class="profile-image">
-               <% } %>
-               <div>
-                 <p><span class="label">ユーザー名:</span><%= course.username %></p>
-                 <h2 class="course-title"><span class="label">フルコースタイトル:</span><%= course.course_name %></h2>
-               </div>
-             </div>
-             <!-- フルコース説明 -->
-             <% if (course.explanation && course.explanation.trim() !== "") { %>
-               <p class="course-explanation"><span class="label">フルコース説明:</span><%= course.explanation %></p>
-             <% } %>
-             <!-- 料理情報 -->
-             <% if (course.dishes && course.dishes.length > 0) { %>
-               <ul class="dish-list">
-                 <% course.dishes.forEach(dish => { %>
-                   <% 
+        <% 
+          // 料理コードに対応する表示名のマッピング
+          const dishTypes = {
+            1: '前菜',
+            2: 'スープ',
+            3: '魚料理',
+            4: '肉料理',
+            5: 'メインディッシュ',
+            6: 'サラダ',
+            7: 'デザート',
+            8: 'ドリンク'
+          };
+        %>
+        <ul class="course-list">
+          <% courses.forEach(course => { %>
+            <li class="course-item">
+              <div class="course-header">
+                <% if (course.profile_image) { %>
+                  <img src="data:image/png;base64,<%= course.profile_image.toString('base64') %>" alt="プロフィール画像" class="profile-image">
+                <% } else { %>
+                  <div class="profile-image" style="background: var(--border-color);"></div>
+                <% } %>
+                <div class="course-info">
+                  <p><span class="label">ユーザー名:</span> <%= course.username %></p>
+                  <h2 class="course-title"><span class="label">フルコースタイトル:</span> <%= course.course_name %></h2>
+                </div>
+              </div>
+              <% if (course.explanation && course.explanation.trim() !== "") { %>
+                <p class="course-explanation"><span class="label">フルコース説明:</span> <%= course.explanation %></p>
+              <% } %>
+              <% if (course.dishes && course.dishes.length > 0) { %>
+                <ul class="dish-list">
+                  <% course.dishes.forEach(dish => { %>
+                    <% 
                       // 表示すべき項目があるかチェック
                       let dishHasContent = false;
                       if ((dish.title && dish.title.trim() !== "") ||
                           (dish.link && dish.link.trim() !== "") ||
-                          (dish.image) ||
+                          dish.image ||
                           (dish.description && dish.description.trim() !== "")) {
-                           dishHasContent = true;
+                        dishHasContent = true;
                       }
-                   %>
-                   <% if (dishHasContent) { %>
-                     <li class="dish-item">
-                       <% if (dish.title && dish.title.trim() !== "") { %>
-                         <p class="dish-title"><span class="label">料理名:</span><%= dish.title %></p>
-                       <% } %>
-                       <% if (dish.link && dish.link.trim() !== "") { %>
-                         <p class="dish-link"><span class="label">リンク:</span><a href="<%= dish.link %>" target="_blank"><%= dish.link %></a></p>
-                       <% } %>
-                       <% if (dish.image) { %>
-                         <p class="dish-image-label"><span class="label">画像:</span></p>
-                         <img src="data:image/png;base64,<%= dish.image.toString('base64') %>" alt="<%= dish.title %>" class="dish-image">
-                       <% } %>
-                       <% if (dish.description && dish.description.trim() !== "") { %>
-                         <p class="dish-description"><span class="label">説明:</span><%= dish.description %></p>
-                       <% } %>
-                     </li>
-                   <% } %>
-                 <% }); %>
-               </ul>
-             <% } %>
-           </li>
-         <% }); %>
-         </ul>
+                    %>
+                    <% if (dishHasContent) { %>
+                      <li class="dish-item">
+                        <p><span class="label">料理種別:</span> <%= dishTypes[dish.dish_code] %></p>
+                        <% if (dish.title && dish.title.trim() !== "") { %>
+                          <p><span class="label">料理名:</span> <%= dish.title %></p>
+                        <% } %>
+                        <% if (dish.link && dish.link.trim() !== "") { %>
+                          <p class="dish-link"><span class="label">リンク:</span> <a href="<%= dish.link %>" target="_blank"><%= dish.link %></a></p>
+                        <% } %>
+                        <% if (dish.image) { %>
+                          <p><span class="label">画像:</span></p>
+                          <img src="data:image/png;base64,<%= dish.image.toString('base64') %>" alt="<%= dish.title %>" class="dish-image">
+                        <% } %>
+                        <% if (dish.description && dish.description.trim() !== "") { %>
+                          <p><span class="label">説明:</span> <%= dish.description %></p>
+                        <% } %>
+                      </li>
+                    <% } %>
+                  <% }); %>
+                </ul>
+              <% } %>
+            </li>
+          <% }); %>
+        </ul>
       <% } %>
     </main>
     <%- include('../views/partials/footer.ejs') %>
