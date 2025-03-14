@@ -1,0 +1,135 @@
+harada
+harada@gmail.com
+harada
+harada
+
+//mysql
+CREATE DATABASE testdb;
+SHOW DATABASES;
+USE testdb;
+
+
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    profile_image LONGBLOB NULL,
+    bio TEXT NULL
+);
+
+
+CREATE TABLE courses (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  course_name VARCHAR(255),
+  explanation TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- 必要であれば、検索対象カラムにインデックスを追加
+ALTER TABLE courses ADD INDEX idx_course_name (course_name);
+ALTER TABLE courses ADD INDEX idx_explanation (explanation(255));
+
+
+
+
+
+
+-- course_dishes テーブル
+CREATE TABLE course_dishes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  course_id INT NOT NULL,
+  dish_code INT NOT NULL,  -- 例: 1=前菜, 2=スープ, etc.
+  title VARCHAR(255),
+  link VARCHAR(255),
+  image LONGBLOB,
+  description TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+  UNIQUE KEY unique_course_dish (course_id, dish_code)
+);
+
+////////////////////////////////////////////////////////
+-- 全てのテーブル名を取得する
+SET GROUP_CONCAT_MAX_LEN=32768; -- GROUP_CONCATの長さ制限を設定
+SELECT GROUP_CONCAT(table_name SEPARATOR ', ') AS tables_to_drop
+FROM information_schema.tables
+WHERE table_schema = 'testdb';
+
+-- 取得したテーブル名を使用して全てのテーブルを削除する
+SET @tables_to_drop = (
+    SELECT GROUP_CONCAT(table_name SEPARATOR ', ')
+    FROM information_schema.tables
+    WHERE table_schema = 'testdb'
+);
+
+SET @drop_query = CONCAT('DROP TABLE IF EXISTS ', @tables_to_drop, ';');
+
+-- テーブルを削除するクエリを実行する
+PREPARE stmt FROM @drop_query;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+
+
+/////////////////////////////////////////////////////////
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(255) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  email VARCHAR(100) NOT NULL UNIQUE,
+  profile_image LONGBLOB NULL,
+  bio TEXT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+
+CREATE TABLE courses (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  course_name VARCHAR(255),
+  explanation TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE course_dishes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  course_id INT NOT NULL,
+  dish_code INT NOT NULL,  -- 例: 1=前菜, 2=スープ, etc.
+  title VARCHAR(255),
+  link VARCHAR(255),
+  image LONGBLOB,
+  description TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+  UNIQUE KEY unique_course_dish (course_id, dish_code)
+);
+
+
+///////////////////////////////////////////////////////////
+
+
+
+
+npm install jsonwebtoken
+npm install bcryptjs
+npm install mysql2
+npm install --save dotenv
+npm install body-parser
+npm install cors
+npm install ejs
+npm install path
+
+//新規
+npm install multer
+npm install express-session

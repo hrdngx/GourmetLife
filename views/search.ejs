@@ -1,53 +1,145 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>検索画面 - Gourmet Life</title>
-    <link rel="stylesheet" href="css/reset.css">
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>検索結果 - Gourmet Life</title>
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* 検索結果のリスト表示用スタイル */
+    .course-list {
+      list-style: none;
+      padding: 0;
+    }
+    .course-item {
+      border: 1px solid #ccc;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      background-color: #fff;
+    }
+    .course-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .profile-image {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      margin-right: 15px;
+      object-fit: cover;
+    }
+    .label {
+      font-weight: bold;
+      margin-right: 5px;
+    }
+    .course-title {
+      font-size: 1.8rem;
+      margin: 0;
+    }
+    .course-explanation {
+      margin-top: 10px;
+      font-size: 1.1rem;
+    }
+    .dish-list {
+      margin-top: 15px;
+      list-style: none;
+      padding-left: 0;
+    }
+    .dish-item {
+      border-top: 1px solid #ddd;
+      padding: 10px 0;
+    }
+    .dish-item:first-child {
+      border-top: none;
+    }
+    .dish-title {
+      font-weight: bold;
+    }
+    .dish-link a {
+      color: var(--primary-color);
+    }
+    .dish-image {
+      max-width: 200px;
+      margin-top: 5px;
+    }
+    .dish-description {
+      margin-top: 5px;
+    }
+  </style>
 </head>
-
 <body>
-    <div class="wrapper">
-        <%- include('partials/header.ejs', { currentPath: currentPath }) %>
-
-        <main>
-            <h1 class="main-title">検索画面</h1>
-
-            <div class="search-form">
-                <form action="/search" method="get">
-                    <input type="text" name="q" class="search-input" placeholder="検索">
-                    <button type="submit" class="search-btn" value="">検索</button>
-                </form>
-            </div>
-
-            <div class="search-result">
-                <h1 class="">検索結果</h1>
-                <div class="table_wrap">
-                    <table class="" border="1">
-                        <thead>
-                            <tr>
-                                <th>名称</th>
-                                <th>いいね数</th>
-                                <th>最終更新日</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><a href="#">大学生Aさんのフルコース</a></td>
-                                <td><a href="#">99999いいね</a></td>
-                                <td>2024/01/01</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </main>
-
-        <%- include('../views/partials/footer.ejs') %>
-    </div>
+  <div class="wrapper">
+    <%- include('partials/header.ejs', { currentPath: currentPath }) %>
+    <main>
+      <h1 class="main-title">検索結果</h1>
+      <!-- 検索フォーム -->
+      <form action="/search" method="get">
+        <input type="text" name="q" value="<%= q %>" placeholder="検索">
+        <button type="submit">検索</button>
+      </form>
+      <% if (courses.length === 0) { %>
+         <p>検索結果はありません。</p>
+      <% } else { %>
+         <ul class="course-list">
+         <% courses.forEach(course => { %>
+           <li class="course-item">
+             <!-- ユーザー情報 -->
+             <div class="course-header">
+               <% if (course.profile_image) { %>
+                 <img src="data:image/png;base64,<%= course.profile_image.toString('base64') %>" alt="<%= course.username %>" class="profile-image">
+               <% } %>
+               <div>
+                 <p><span class="label">ユーザー名:</span><%= course.username %></p>
+                 <h2 class="course-title"><span class="label">フルコースタイトル:</span><%= course.course_name %></h2>
+               </div>
+             </div>
+             <!-- フルコース説明 -->
+             <% if (course.explanation && course.explanation.trim() !== "") { %>
+               <p class="course-explanation"><span class="label">フルコース説明:</span><%= course.explanation %></p>
+             <% } %>
+             <!-- 料理情報 -->
+             <% if (course.dishes && course.dishes.length > 0) { %>
+               <ul class="dish-list">
+                 <% course.dishes.forEach(dish => { %>
+                   <% 
+                      // 表示すべき項目があるかチェック
+                      let dishHasContent = false;
+                      if ((dish.title && dish.title.trim() !== "") ||
+                          (dish.link && dish.link.trim() !== "") ||
+                          (dish.image) ||
+                          (dish.description && dish.description.trim() !== "")) {
+                           dishHasContent = true;
+                      }
+                   %>
+                   <% if (dishHasContent) { %>
+                     <li class="dish-item">
+                       <% if (dish.title && dish.title.trim() !== "") { %>
+                         <p class="dish-title"><span class="label">料理名:</span><%= dish.title %></p>
+                       <% } %>
+                       <% if (dish.link && dish.link.trim() !== "") { %>
+                         <p class="dish-link"><span class="label">リンク:</span><a href="<%= dish.link %>" target="_blank"><%= dish.link %></a></p>
+                       <% } %>
+                       <% if (dish.image) { %>
+                         <p class="dish-image-label"><span class="label">画像:</span></p>
+                         <img src="data:image/png;base64,<%= dish.image.toString('base64') %>" alt="<%= dish.title %>" class="dish-image">
+                       <% } %>
+                       <% if (dish.description && dish.description.trim() !== "") { %>
+                         <p class="dish-description"><span class="label">説明:</span><%= dish.description %></p>
+                       <% } %>
+                     </li>
+                   <% } %>
+                 <% }); %>
+               </ul>
+             <% } %>
+           </li>
+         <% }); %>
+         </ul>
+      <% } %>
+    </main>
+    <%- include('../views/partials/footer.ejs') %>
+  </div>
 </body>
-
 </html>
