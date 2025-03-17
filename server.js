@@ -200,13 +200,6 @@ app.get('/home', loginCheck, (req, res) => {
   });
 });
 
-
-
-
-
-
-
-
 // 検索画面 GET /search （ログイン必須）
 app.get('/search', loginCheck, (req, res) => {
   const q = req.query.q;
