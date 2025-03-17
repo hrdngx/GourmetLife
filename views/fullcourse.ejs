@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="css/index.css">
   <link rel="stylesheet" href="css/style.css">
   <style>
-    /* CSS Variables と基本設定 */
     :root {
       --primary-color: #007bff;
       --primary-hover: #0056b3;
@@ -116,7 +115,6 @@
       border-top: 1px solid var(--border-color);
       grid-column: 1 / -1;
     }
-    /* レスポンシブ対応 */
     @media (min-width: 768px) {
       form {
         grid-template-columns: repeat(2, 1fr);
@@ -133,7 +131,6 @@
     <main>
       <h1 class="main-title">フルコース</h1>
       <div class="fullcourse-form">
-        <!-- POST /fullcourse に送信 -->
         <form action="/fullcourse" method="POST" enctype="multipart/form-data">
           <section class="form-group">
             <label for="course-name">タイトル</label>
@@ -148,7 +145,6 @@
           <hr>
 
           <% 
-            // 料理カテゴリー定義（前菜～ドリンク）
             const dishes = [
               { code: 1, name: 'appetizer', label: '前菜' },
               { code: 2, name: 'soup', label: 'スープ' },
@@ -176,7 +172,7 @@
 
             <div class="form-group">
               <label for="<%= dish.name %>-image">画像</label>
-              <input type="file" id="<%= dish.name %>-image" name="<%= dish.name %>-image" accept="image/*" onchange="previewImage(event, '<%= dish.name %>-preview')">
+              <input type="file" id="<%= dish.name %>-image" name="<%= dish.name %>-image" accept=".jpg,.jpeg,.png,.gif" onchange="previewImage(event, '<%= dish.name %>-preview')">
               <% if (course && course[`${dish.name}_image`]) { %>
                 <img id="<%= dish.name %>-preview" 
                      src="data:image/png;base64,<%= course[`${dish.name}_image`].toString('base64') %>" 
@@ -193,6 +189,22 @@
               <% } %>
             </div>
 
+            <div class="file-extension-notice">
+              表示できる画像ファイルは <strong>.jpg, .jpeg, .png, .gif</strong> だけを使えます！！！
+            </div>
+            
+            <style>
+              .file-extension-notice {
+                margin-bottom: 1px;
+                padding: 0.5px; /* 高さを低くする */
+                background-color: #f0f8ff;
+                border: 1px solid #007bff;
+                border-radius: 4px;
+                font-size: 12px; /* 文字を小さくする */
+              }
+            </style>
+            
+
             <div class="form-group">
               <label for="<%= dish.name %>-description">説明</label>
               <textarea id="<%= dish.name %>-description" name="<%= dish.name %>-description" rows="3"><%= course ? course[`${dish.name}_description`] : '' %></textarea>
@@ -206,10 +218,9 @@
         </form>
       </div>
     </main>
-    <%- include('../views/partials/footer.ejs') %>
+    <%- include('partials/footer.ejs') %>
   </div>
 
-  <!-- 画像プレビュー用 JavaScript -->
   <script>
     function previewImage(event, previewId) {
       const file = event.target.files[0];
@@ -223,7 +234,6 @@
         }
         reader.readAsDataURL(file);
       } else {
-        // ファイルが選択されなかった場合、data-original 属性の値を復元
         const original = img.getAttribute('data-original');
         if (original) {
           img.src = original;

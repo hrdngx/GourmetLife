@@ -33,9 +33,23 @@ app.use((req, res, next) => {
   next();
 });
 
-// Multer の設定（画像などのファイルはメモリ上に保持）
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage }).fields([
+// 許可する画像形式（MIME タイプ）
+const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+// Multer のファイルフィルタ
+const fileFilter = (req, file, cb) => {
+  if (allowedMimeTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error('使用できる画像形式は、.jpg, .jpeg, .png, .gif のみです'), false);
+  }
+};
+
+// Multer の設定（画像はメモリ上に保持、各ファイルは最大 5MB に制限）
+const upload = multer({
+  storage: multer.memoryStorage(),
+  fileFilter: fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB
+}).fields([
   { name: 'appetizer-image' },
   { name: 'soup-image' },
   { name: 'fish-image' },
@@ -45,6 +59,13 @@ const upload = multer({ storage: storage }).fields([
   { name: 'dessert-image' },
   { name: 'drink-image' },
 ]);
+
+// プロフィール画像用 multer 設定（同様の制限）
+const profileUpload = multer({
+  storage: multer.memoryStorage(),
+  fileFilter: fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB
+});
 
 // MySQL 接続設定
 const db = mysql.createConnection({
@@ -70,6 +91,7 @@ function loginCheck(req, res, next) {
 }
 
 /* ルート定義 */
+
 // ランディングページ
 app.get('/', (req, res) => {
   res.render('index');
@@ -101,21 +123,14 @@ app.get('/logout', (req, res) => {
   res.redirect('/');
 });
 
-
-
-
-
-
-// GET /signup では、エラーメッセージがなければ null を渡す
+// 会員登録（サインアップ）
 app.get('/signup', (req, res) => {
   res.render('signup', { errorMessage: null, username: '', email: '' });
 });
 
-// POST /signup の変更例
 app.post('/signup', (req, res) => {
   const { username, email, password, confirm_password, agree } = req.body;
   
-  // 入力チェック：パスワード不一致の場合はエラーメッセージ付きで再レンダリング
   if (password !== confirm_password) {
     return res.render('signup', {
       errorMessage: 'パスワードが一致しません。',
@@ -123,7 +138,6 @@ app.post('/signup', (req, res) => {
       email
     });
   }
-  // 利用規約未同意の場合
   if (!agree) {
     return res.render('signup', {
       errorMessage: '利用規約に同意してください。',
@@ -136,7 +150,6 @@ app.post('/signup', (req, res) => {
   db.query(insertUserQuery, [username, email, password], (err, result) => {
     if (err) {
       console.error('ユーザー登録エラー:', err);
-      // DB側で重複エラーの場合（MySQLのエラーコード ER_DUP_ENTRY など）
       if (err.code === 'ER_DUP_ENTRY') {
         return res.render('signup', {
           errorMessage: 'このユーザー名またはメールアドレスは既に使用されています。',
@@ -151,102 +164,12 @@ app.post('/signup', (req, res) => {
         });
       }
     }
-    // 正常に登録された場合は success.ejs を表示（header, footerを含めた画面にする場合は success.ejs 内に header/footer の include を記述）
     res.render('success', { username });
   });
 });
-
-
-// 会員登録関連
-/*
-app.get('/signup', (req, res) => {
-  res.render('signup');
-});
-app.post('/signup', (req, res) => {
-  const { username, email, password, confirm_password, agree } = req.body;
-  if (password !== confirm_password) {
-    return res.send('パスワードが一致しません。');
-  }
-  if (!agree) {
-    return res.send('利用規約に同意してください。');
-  }
-  const insertUserQuery = 'INSERT INTO users (username, email, password) VALUES (?, ?, ?)';
-  db.query(insertUserQuery, [username, email, password], (err, result) => {
-    if (err) {
-      console.error('ユーザー登録エラー:', err);
-      return res.status(500).send('サーバーエラー');
-    }
-    // 登録完了ページ（success.ejs）を表示
-    res.render('success', { username });
-  });
-});
-*/
-
-
-/*
-app.post('/signup', (req, res) => {
-  const { username, email, password, confirm_password, agree } = req.body;
-  if (password !== confirm_password) {
-    return res.render('signup', { errorMessage: 'パスワードが一致しません。', username, email });
-  }
-  if (!agree) {
-    return res.render('signup', { errorMessage: '利用規約に同意してください。', username, email });
-  }
-  const insertUserQuery = 'INSERT INTO users (username, email, password) VALUES (?, ?, ?)';
-  db.query(insertUserQuery, [username, email, password], (err, result) => {
-    if (err) {
-      console.error('ユーザー登録エラー:', err);
-      if (err.code === 'ER_DUP_ENTRY') {
-        // すでに同じユーザーが登録されている場合
-        return res.render('signup', { errorMessage: '既に登録されているユーザーです。ログインしてください。', username, email });
-      }
-      return res.status(500).render('signup', { errorMessage: 'サーバーエラーが発生しました。', username, email });
-    }
-    // 登録完了画面（success.ejs）を表示
-    res.render('success', { username });
-  });
-});
-*/
-
 
 // ユーザーマイページ /home（ログイン必須）
-/*
 app.get('/home', loginCheck, (req, res) => {
-  // DBからタイムラインデータなどを取得する場合はここで実装
-  const dummyFullcourses = []; // 実際はDBから取得したデータを渡す
-  res.render('home', {
-    username: req.session.user.username,
-    fullcourses: dummyFullcourses
-  });
-});*/
-
-
-/*
-app.get('/home', loginCheck, (req, res) => {
-  // ユーザー情報とコース情報をJOINして、最新のコースを取得
-  const timelineQuery = `
-    SELECT courses.*, users.username, users.profile_image
-    FROM courses
-    JOIN users ON courses.user_id = users.id
-    ORDER BY courses.created_at DESC
-    LIMIT 20
-  `;
-  db.query(timelineQuery, (err, results) => {
-    if (err) {
-      console.error('タイムライン取得エラー:', err);
-      return res.status(500).send('サーバーエラー');
-    }
-    res.render('home', {
-      username: req.session.user.username,
-      fullcourses: results
-    });
-  });
-});*/
-
-
-
-app.get('/home', loginCheck, (req, res) => {
-  // ユーザー情報とコース情報をJOINして、最新のコースを取得
   const timelineQuery = `
     SELECT courses.*, users.username, users.profile_image
     FROM courses
@@ -284,14 +207,14 @@ app.get('/home', loginCheck, (req, res) => {
   });
 });
 
-// 検索画面 GET /search （ログイン必須）
+// 検索画面 /search（ログイン必須）
+/*
 app.get('/search', loginCheck, (req, res) => {
   const q = req.query.q;
   if (!q) {
     return res.render('search', { courses: [], q: '' });
   }
   const searchTerm = '%' + q + '%';
-  // courses と users を JOIN して、投稿者情報を取得し、ユーザー名も検索対象に追加
   const searchQuery = `
     SELECT courses.*, users.username, users.profile_image
     FROM courses
@@ -325,13 +248,62 @@ app.get('/search', loginCheck, (req, res) => {
       });
     });
   });
+});*/
+
+
+app.get('/search', loginCheck, (req, res) => {
+  const q = req.query.q;
+  if (!q) {
+    return res.render('search', { courses: [], q: '' });
+  }
+  const searchTerm = '%' + q + '%';
+  const searchQuery = `
+    SELECT DISTINCT courses.*, users.username, users.profile_image
+    FROM courses
+    JOIN users ON courses.user_id = users.id
+    LEFT JOIN course_dishes ON courses.id = course_dishes.course_id
+    WHERE courses.course_name LIKE ?
+      OR courses.explanation LIKE ?
+      OR users.username LIKE ?
+      OR course_dishes.title LIKE ?
+      OR course_dishes.link LIKE ?
+      OR course_dishes.description LIKE ?
+    ORDER BY courses.updated_at DESC
+  `;
+  const params = [searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm];
+  db.query(searchQuery, params, (err, courseResults) => {
+    if (err) {
+      console.error('検索エラー:', err);
+      return res.status(500).send('サーバーエラー');
+    }
+    if (courseResults.length === 0) {
+      return res.render('search', { courses: [], q });
+    }
+    let courses = courseResults;
+    let count = courses.length;
+    courses.forEach(course => {
+      const selectDishesQuery = 'SELECT * FROM course_dishes WHERE course_id = ?';
+      db.query(selectDishesQuery, [course.id], (err, dishResults) => {
+        if (err) {
+          console.error('料理情報取得エラー:', err);
+          course.dishes = [];
+        } else {
+          course.dishes = dishResults;
+        }
+        count--;
+        if (count === 0) {
+          res.render('search', { courses, q });
+        }
+      });
+    });
+  });
 });
 
 
+// プロフィール表示（ログイン必須）
 app.get('/profile', loginCheck, (req, res) => {
   let profileImage = req.session.user.profile_image;
   if (profileImage) {
-    // Buffer を Base64 文字列に変換し、データURL形式にする
     profileImage = `data:image/jpeg;base64,${Buffer.from(profileImage).toString('base64')}`;
   } else {
     profileImage = '/images/default-profile.png';
@@ -343,21 +315,14 @@ app.get('/profile', loginCheck, (req, res) => {
   });
 });
 
-
-
-const profileUpload = multer({ storage: multer.memoryStorage() });
-
-
+// プロフィール編集
 app.post('/profile/edit', loginCheck, profileUpload.single('profile_image'), (req, res) => {
   const userId = req.session.user.id;
   const bio = req.body.bio || '';
   let profileImage = null;
-
-  // 画像がアップロードされていれば、バッファを取得
   if (req.file) {
     profileImage = req.file.buffer;
   }
-
   let query, params;
   if (profileImage) {
     query = 'UPDATE users SET profile_image = ?, bio = ? WHERE id = ?';
@@ -366,13 +331,11 @@ app.post('/profile/edit', loginCheck, profileUpload.single('profile_image'), (re
     query = 'UPDATE users SET bio = ? WHERE id = ?';
     params = [bio, userId];
   }
-
   db.query(query, params, (err, result) => {
     if (err) {
       console.error('プロフィール更新エラー:', err);
       return res.status(500).send('サーバーエラー');
     }
-    // セッション内のユーザー情報も更新
     req.session.user.bio = bio;
     if (profileImage) {
       req.session.user.profile_image = profileImage;
@@ -381,7 +344,7 @@ app.post('/profile/edit', loginCheck, profileUpload.single('profile_image'), (re
   });
 });
 
-
+// プロフィール画像削除
 app.post('/profile/delete-image', loginCheck, (req, res) => {
   const userId = req.session.user.id;
   const query = 'UPDATE users SET profile_image = NULL WHERE id = ?';
@@ -390,13 +353,12 @@ app.post('/profile/delete-image', loginCheck, (req, res) => {
       console.error('プロフィール画像削除エラー:', err);
       return res.status(500).send('サーバーエラー');
     }
-    // セッション内のプロフィール画像も削除
     req.session.user.profile_image = null;
     res.redirect('/profile');
   });
 });
 
-// フルコース作成・更新ページ（/course） ※confirm.ejs を利用
+// フルコース作成・更新（course ページ）
 app.get('/course', loginCheck, (req, res) => {
   const userId = req.session.user.id;
   const selectCourseQuery = 'SELECT * FROM courses WHERE user_id = ? LIMIT 1';
@@ -508,8 +470,7 @@ app.post('/course', loginCheck, upload, (req, res) => {
   });
 });
 
-// フルコース作成・更新ページ（fullcourse.ejs を利用）
-// GET: 既存のコース情報を取得して表示
+// フルコース作成・更新（fullcourse ページ）
 app.get('/fullcourse', loginCheck, (req, res) => {
   const userId = req.session.user.id;
   const selectCourseQuery = 'SELECT * FROM courses WHERE user_id = ? LIMIT 1';
@@ -520,7 +481,6 @@ app.get('/fullcourse', loginCheck, (req, res) => {
     }
     if (courseResults.length > 0) {
       let course = courseResults[0];
-      // fullcourse.ejs 用に各料理の項目をセット（DBの course_dishes から取得）
       const dishTypes = [
         { code: 1, name: 'appetizer' },
         { code: 2, name: 'soup' },
@@ -554,7 +514,6 @@ app.get('/fullcourse', loginCheck, (req, res) => {
   });
 });
 
-// POST: fullcourse の作成・更新
 app.post('/fullcourse', loginCheck, upload, (req, res) => {
   const userId = req.session.user.id;
   const courseName = req.body['course-name'] || null;
@@ -600,56 +559,53 @@ app.post('/fullcourse', loginCheck, upload, (req, res) => {
     }
 
     function upsertDishesFull(courseId) {
-        dishTypes.forEach(dish => {
-          const title = req.body[`${dish.name}-title`] || null;
-          const link = req.body[`${dish.name}-link`] || null;
-          let image = null;
-          if (req.files && req.files[`${dish.name}-image`] && req.files[`${dish.name}-image`][0]) {
-            image = req.files[`${dish.name}-image`][0].buffer;
+      dishTypes.forEach(dish => {
+        const title = req.body[`${dish.name}-title`] || null;
+        const link = req.body[`${dish.name}-link`] || null;
+        let image = null;
+        if (req.files && req.files[`${dish.name}-image`] && req.files[`${dish.name}-image`][0]) {
+          image = req.files[`${dish.name}-image`][0].buffer;
+        }
+        const description = req.body[`${dish.name}-description`] || null;
+    
+        const selectDishQuery = 'SELECT * FROM course_dishes WHERE course_id = ? AND dish_code = ? LIMIT 1';
+        db.query(selectDishQuery, [courseId, dish.code], (err, dishResults) => {
+          if (err) {
+            console.error(`料理(${dish.name})検索エラー:`, err);
+            return;
           }
-          const description = req.body[`${dish.name}-description`] || null;
-      
-          const selectDishQuery = 'SELECT * FROM course_dishes WHERE course_id = ? AND dish_code = ? LIMIT 1';
-          db.query(selectDishQuery, [courseId, dish.code], (err, dishResults) => {
-            if (err) {
-              console.error(`料理(${dish.name})検索エラー:`, err);
-              return;
-            }
-            if (dishResults.length === 0) {
-              // 新規登録の場合
-              const insertDishQuery = 'INSERT INTO course_dishes (course_id, dish_code, title, link, image, description) VALUES (?, ?, ?, ?, ?, ?)';
-              db.query(insertDishQuery, [courseId, dish.code, title, link, image, description], (err, result) => {
+          if (dishResults.length === 0) {
+            const insertDishQuery = 'INSERT INTO course_dishes (course_id, dish_code, title, link, image, description) VALUES (?, ?, ?, ?, ?, ?)';
+            db.query(insertDishQuery, [courseId, dish.code, title, link, image, description], (err, result) => {
+              if (err) {
+                console.error(`料理(${dish.name})INSERTエラー:`, err);
+              }
+            });
+          } else {
+            if (image === null) {
+              const updateDishQuery = 'UPDATE course_dishes SET title = ?, link = ?, description = ? WHERE course_id = ? AND dish_code = ?';
+              db.query(updateDishQuery, [title, link, description, courseId, dish.code], (err, result) => {
                 if (err) {
-                  console.error(`料理(${dish.name})INSERTエラー:`, err);
+                  console.error(`料理(${dish.name})UPDATEエラー:`, err);
                 }
               });
             } else {
-              // 更新の場合：新しい画像がアップロードされていれば image も更新、それ以外の場合は image カラムは更新しない
-              if (image === null) {
-                const updateDishQuery = 'UPDATE course_dishes SET title = ?, link = ?, description = ? WHERE course_id = ? AND dish_code = ?';
-                db.query(updateDishQuery, [title, link, description, courseId, dish.code], (err, result) => {
-                  if (err) {
-                    console.error(`料理(${dish.name})UPDATEエラー:`, err);
-                  }
-                });
-              } else {
-                const updateDishQuery = 'UPDATE course_dishes SET title = ?, link = ?, image = ?, description = ? WHERE course_id = ? AND dish_code = ?';
-                db.query(updateDishQuery, [title, link, image, description, courseId, dish.code], (err, result) => {
-                  if (err) {
-                    console.error(`料理(${dish.name})UPDATEエラー:`, err);
-                  }
-                });
-              }
+              const updateDishQuery = 'UPDATE course_dishes SET title = ?, link = ?, image = ?, description = ? WHERE course_id = ? AND dish_code = ?';
+              db.query(updateDishQuery, [title, link, image, description, courseId, dish.code], (err, result) => {
+                if (err) {
+                  console.error(`料理(${dish.name})UPDATEエラー:`, err);
+                }
+              });
             }
-          });
+          }
         });
-        res.redirect('/fullcourse');
-      }
-      
+      });
+      res.redirect('/fullcourse');
+    }
   });
 });
 
-// 存在しないルートは404エラー
+// 存在しないルートは 404 エラー
 app.use((req, res) => {
   res.status(404).send('ページが見つかりません');
 });

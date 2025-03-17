@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
   <style>
-    /* プロフィール画像がない場合の初期アイコン */
     .default-profile-icon {
       width: 120px;
       height: 120px;
@@ -21,7 +20,6 @@
       color: #fff;
       margin: 0 auto;
     }
-    /* プロフィール画像がある場合のスタイル */
     .profile-image {
       width: 120px;
       height: 120px;
@@ -53,7 +51,6 @@
     <main>
       <h1 class="main-title">プロフィール</h1>
       <div class="profile-card">
-        <!-- プロフィール画像が設定されていれば表示、なければ初期アイコン -->
         <% if (profileImage && profileImage !== '/images/default-profile.png') { %>
           <img src="<%= profileImage %>" alt="プロフィール画像" class="profile-image">
         <% } else { %>
@@ -65,13 +62,28 @@
         <p class="profile-bio"><%= bio %></p>
       </div>
       
-      <!-- プロフィール設定フォームなど -->
       <hr>
       <div class="profile-settings">
         <h2 class="settings-title">プロフィール設定</h2>
         <form action="/profile/edit" method="POST" enctype="multipart/form-data">
           <label>プロフィール画像を変更 (最大 5MB):</label>
-          <input type="file" name="profile_image" accept="image/*">
+          <input type="file" name="profile_image" accept=".jpg,.jpeg,.png,.gif">
+          
+          <div class="file-extension-notice">
+            表示できる画像ファイルは <strong>.jpg, .jpeg, .png, .gif</strong> だけを使えます！！！
+          </div>
+          
+          <style>
+            .file-extension-notice {
+              margin-bottom: 1px;
+              padding: 0.5px; /* 高さを低くする */
+              background-color: #f0f8ff;
+              border: 1px solid #007bff;
+              border-radius: 4px;
+              font-size: 12px; /* 文字を小さくする */
+            }
+          </style>
+          
   
           <label>自己紹介 (最大 200文字):</label>
           <textarea name="bio" maxlength="200"><%= bio %></textarea>
