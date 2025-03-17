@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="/css/index.css">
   <link rel="stylesheet" href="/css/style.css">
   <style>
-    /* CSS Variables と基本設定 */
+    /* 共通設定 */
     :root {
       --primary-color: #007bff;
       --primary-hover: #0056b3;
@@ -17,6 +17,7 @@
       --border-color: #e0e0e0;
       --text-color: #333;
       --font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      --base-font-size: 16px;
     }
     body {
       font-family: var(--font-family);
@@ -24,6 +25,7 @@
       margin: 0;
       padding: 0;
       color: var(--text-color);
+      font-size: var(--base-font-size);
     }
     .wrapper {
       max-width: 1200px;
@@ -32,106 +34,164 @@
     }
     main {
       background: var(--card-bg);
-      padding: 40px;
+      padding: 30px;
       border-radius: 8px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
       margin-bottom: 20px;
     }
     h1.main-title {
       text-align: center;
-      margin-bottom: 40px;
-      font-size: 2.5rem;
+      margin-bottom: 30px;
+      font-size: 2rem;
     }
     .greeting {
       text-align: center;
-      font-size: 1.2rem;
-      margin-bottom: 30px;
+      font-size: 1.1rem;
+      margin-bottom: 20px;
     }
+    /* タイムライン全体 */
     .timeline {
-      margin-top: 40px;
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      margin-top: 30px;
     }
     .timeline h2 {
-      font-size: 1.8rem;
-      margin-bottom: 20px;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 10px;
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+      color: var(--primary-color);
+      text-align: left;
     }
     .timeline-data {
       display: flex;
       flex-direction: column;
       gap: 20px;
     }
+    /* タイムラインカード */
     .fullcourse-item {
-      padding: 20px;
+      background: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: 8px;
-      background-color: #fafafa;
+      padding: 15px 20px;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .fullcourse-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
     .fullcourse-item h3 {
-      margin-top: 0;
-      font-size: 1.6rem;
+      font-size: 1.4rem;
+      margin: 0 0 8px 0;
+      color: var(--primary-color);
+      text-align: left;
     }
     .fullcourse-item p {
-      margin: 8px 0;
+      font-size: 1rem;
+      line-height: 1.5;
+      margin: 5px 0;
+      text-align: left;
     }
-    .fullcourse-item .user-info {
+    /* ユーザー情報 */
+    .user-info {
       display: flex;
       align-items: center;
-      gap: 10px;
+      margin-top: 10px;
     }
-    .fullcourse-item .user-info img {
+    .user-info img {
       width: 40px;
       height: 40px;
-      object-fit: cover;
       border-radius: 50%;
-      border: 1px solid var(--border-color);
+      margin-right: 10px;
+      object-fit: cover;
+      border: 1px solid #ccc;
     }
+    .user-info p {
+      font-size: 0.9rem;
+      margin: 0;
+    }
+    /* 料理詳細 */
     .course-dishes {
       margin-top: 15px;
+      border-top: 1px solid #eee;
       padding-top: 10px;
-      border-top: 1px solid var(--border-color);
     }
     .course-dishes h4 {
-      margin-bottom: 10px;
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+      color: var(--primary-color);
+      text-align: center;
     }
+    /* 個々の料理情報（中央揃え） */
     .dish-item {
-      margin-bottom: 15px;
+      background: #f9f9f9;
       padding: 10px;
-      border: 1px dashed var(--border-color);
+      border-left: 3px solid var(--primary-color);
       border-radius: 4px;
+      margin-bottom: 10px;
+      text-align: center;
     }
     .dish-item h5 {
+      font-size: 1.1rem;
       margin: 0 0 5px 0;
-      font-size: 1.2rem;
+      text-align: center;
     }
-    .dish-item img {
-      max-width: 100px;
-      max-height: 100px;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      object-fit: cover;
-      margin-top: 5px;
+    .dish-item p {
+      font-size: 0.95rem;
+      margin: 3px 0;
+      text-align: center;
+    }
+    .dish-item a {
+      font-size: 0.95rem;
+      text-decoration: none;
+      color: var(--primary-color);
+    }
+    .dish-item a:hover {
+      text-decoration: underline;
+    }
+    /* 画像を画面全体の半分の幅で表示（PC用） */
+    @media (min-width: 768px) {
+      .dish-item img {
+        width: 50vw;
+        height: auto;
+        object-fit: cover;
+        display: block;
+        margin: 10px auto 0;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+      }
+    }
+    @media (max-width: 767px) {
+      .dish-item img {
+        width: 90vw;
+        height: auto;
+        object-fit: cover;
+        display: block;
+        margin: 10px auto 0;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+      }
     }
     hr {
       border: none;
       border-top: 1px solid var(--border-color);
-      margin: 30px 0;
+      margin: 20px 0;
     }
-    .navigation {
-      margin-top: 40px;
-    }
+    /* ナビゲーション */
     .nav-links {
       display: flex;
-      gap: 20px;
+      gap: 15px;
       flex-wrap: wrap;
       justify-content: center;
+      margin-top: 20px;
     }
     .nav-links a {
       text-decoration: none;
-      font-size: 1rem;
+      font-size: 0.95rem;
       color: var(--primary-color);
       border: 1px solid var(--primary-color);
-      padding: 10px 20px;
+      padding: 8px 15px;
       border-radius: 4px;
       transition: background-color 0.3s ease;
     }
@@ -188,12 +248,12 @@
                   <% if (course.profile_image) { %>
                     <img src="data:image/jpeg;base64,<%= Buffer.from(course.profile_image).toString('base64') %>" alt="投稿者画像">
                   <% } else { %>
-                    <img src="/images/default-profile.png" alt="デフォルト画像">
-                  <% } %>
+                    <img src="/images/default-user-icon.png" alt="デフォルト画像">
+                  <% } %>                  
                   <p><strong>投稿者:</strong> <%= course.username %></p>
                 </div>
                 
-                <!-- 料理情報（存在するフィールドのみ出力） -->
+                <!-- 料理情報 -->
                 <% if (course.dishes && course.dishes.length > 0) { %>
                   <div class="course-dishes">
                     <h4>料理詳細</h4>
@@ -213,9 +273,7 @@
                             <p><strong>説明:</strong> <%= dish.description %></p>
                           <% } %>
                           <% if (dish.image) { %>
-                            <div class="dish-image">
-                              <img src="data:image/jpeg;base64,<%= Buffer.from(dish.image).toString('base64') %>" alt="<%= dish.title %>">
-                            </div>
+                            <img src="data:image/jpeg;base64,<%= Buffer.from(dish.image).toString('base64') %>" alt="<%= dish.title %>">
                           <% } %>
                         </div>
                       <% } %>

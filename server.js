@@ -95,12 +95,70 @@ app.post('/login', (req, res) => {
     }
   });
 });
+
 app.get('/logout', (req, res) => {
   req.session.destroy();
   res.redirect('/');
 });
 
+
+
+
+
+
+// GET /signup では、エラーメッセージがなければ null を渡す
+app.get('/signup', (req, res) => {
+  res.render('signup', { errorMessage: null, username: '', email: '' });
+});
+
+// POST /signup の変更例
+app.post('/signup', (req, res) => {
+  const { username, email, password, confirm_password, agree } = req.body;
+  
+  // 入力チェック：パスワード不一致の場合はエラーメッセージ付きで再レンダリング
+  if (password !== confirm_password) {
+    return res.render('signup', {
+      errorMessage: 'パスワードが一致しません。',
+      username,
+      email
+    });
+  }
+  // 利用規約未同意の場合
+  if (!agree) {
+    return res.render('signup', {
+      errorMessage: '利用規約に同意してください。',
+      username,
+      email
+    });
+  }
+  
+  const insertUserQuery = 'INSERT INTO users (username, email, password) VALUES (?, ?, ?)';
+  db.query(insertUserQuery, [username, email, password], (err, result) => {
+    if (err) {
+      console.error('ユーザー登録エラー:', err);
+      // DB側で重複エラーの場合（MySQLのエラーコード ER_DUP_ENTRY など）
+      if (err.code === 'ER_DUP_ENTRY') {
+        return res.render('signup', {
+          errorMessage: 'このユーザー名またはメールアドレスは既に使用されています。',
+          username,
+          email
+        });
+      } else {
+        return res.render('signup', {
+          errorMessage: 'サーバーエラーが発生しました。もう一度お試しください。',
+          username,
+          email
+        });
+      }
+    }
+    // 正常に登録された場合は success.ejs を表示（header, footerを含めた画面にする場合は success.ejs 内に header/footer の include を記述）
+    res.render('success', { username });
+  });
+});
+
+
 // 会員登録関連
+/*
 app.get('/signup', (req, res) => {
   res.render('signup');
 });
@@ -122,7 +180,33 @@ app.post('/signup', (req, res) => {
     res.render('success', { username });
   });
 });
+*/
 
+
+/*
+app.post('/signup', (req, res) => {
+  const { username, email, password, confirm_password, agree } = req.body;
+  if (password !== confirm_password) {
+    return res.render('signup', { errorMessage: 'パスワードが一致しません。', username, email });
+  }
+  if (!agree) {
+    return res.render('signup', { errorMessage: '利用規約に同意してください。', username, email });
+  }
+  const insertUserQuery = 'INSERT INTO users (username, email, password) VALUES (?, ?, ?)';
+  db.query(insertUserQuery, [username, email, password], (err, result) => {
+    if (err) {
+      console.error('ユーザー登録エラー:', err);
+      if (err.code === 'ER_DUP_ENTRY') {
+        // すでに同じユーザーが登録されている場合
+        return res.render('signup', { errorMessage: '既に登録されているユーザーです。ログインしてください。', username, email });
+      }
+      return res.status(500).render('signup', { errorMessage: 'サーバーエラーが発生しました。', username, email });
+    }
+    // 登録完了画面（success.ejs）を表示
+    res.render('success', { username });
+  });
+});
+*/
 
 
 // ユーザーマイページ /home（ログイン必須）
